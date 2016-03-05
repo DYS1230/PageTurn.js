@@ -1,27 +1,30 @@
 (function ($) {
-    $.fn.extendPagination = function (options,obj,targetHerf) {
+    $.fn.extendPagination = function (options,obj,targetHerf) {　//obj为所要替换的对象
+        //　默认　总数量　展示页面　每个页面展示的数量 　返回的函数
         var defaults = {
-            totalCount: '100',
-            showPage: '7',
-            limit: '5',
+            totalCount: 100,
+            showPage: 7,
+            limit: 5,
             callback: function () {
                 return false;
             }
         };
-        $.extend(defaults, options || {});
-        var targetId="#"+$(obj).attr("id");
-        var totalCount = Number(defaults.totalCount);
-        var showPage = Number(defaults.showPage);
-        var limit = Number(defaults.limit); 
-        var totalPage = Math.ceil(totalCount / limit);
+        $.extend(defaults, options || {}); //倘若没有options，则采用默认，否则options覆盖defaults
+        var targetId="#"+$(obj).attr("id");　//　采用load所需要得到的内容的id
+        var totalCount = defaults.totalCount; 
+        var showPage = defaults.showPage;
+        var limit = defaults.limit; 
+        var totalPage = Math.ceil(totalCount / limit); //页面总量
         if (totalPage > 0) {
-            var html = [];
-            html.push(' <ul class="pagination">');
-            html.push(' <li class="previous"><a href="#">&laquo;</a></li>');
-            html.push('<li class="disabled hidden"><a href="#">...</a></li>');
+            var html = [];  //要添加的html
+            html.push(' <ul class="pagination">');  //　这里看bootstrap的分页，不解释
+            html.push(' <li class="previous"><a href="#">&laquo;</a></li>');    //链接到上一页
+            html.push('<li class="disabled hidden"><a href="#">...</a></li>');  //说明前面有页面
+
+            //分两种情况，当总页面小于显示页面时，和当总页面大于显示页面时，具体区别在所要显示的页码i和j
             if (totalPage <= showPage) {
                 for (var i = 1; i <= totalPage; i++) {
-                    if (i == 1) html.push(' <li class="active"><a href="#">' + i + '</a></li>');
+                    if (i == 1) html.push(' <li class="active"><a href="#">' + i + '</a></li>');    //第一个页码样式为active
                     else html.push(' <li><a href="#">' + i + '</a></li>');
                 }
             } else {
@@ -30,15 +33,15 @@
                     else html.push(' <li><a href="#">' + j + '</a></li>');
                 }
             }
-            html.push('<li class="disabled hidden"><a href="#">...</a></li>');
-            html.push('<li class="next"><a href="#">&raquo;</a></li></ul>');
+            html.push('<li class="disabled hidden"><a href="#">...</a></li>');  //说明后面有页面
+            html.push('<li class="next"><a href="#">&raquo;</a></li></ul>');    //链接到下一页
             $(this).html(html.join(''));
-            if (totalPage > showPage) $(this).find('ul.pagination li.next').prev().removeClass('hidden');
+            if (totalPage > showPage) $(this).find('ul.pagination li.next').prev().removeClass('hidden');　//当总页面数量大于显示页面数量时，后面的省略号可见
 
-            var pageObj = $(this).find('ul.pagination');
-            var preObj = pageObj.find('li.previous');
-            var currentObj = pageObj.find('li').not('.previous,.disabled,.next');
-            var nextObj = pageObj.find('li.next');
+            var pageObj = $(this).find('ul.pagination');    //找到页码的ul
+            var preObj = pageObj.find('li.previous');   //找到代表前一页的li
+            var currentObj = pageObj.find('li').not('.previous,.disabled,.next'); //找到目前显示的页码对象
+            var nextObj = pageObj.find('li.next');   //找到代表后一页的li
 
             function loopPageElement(minPage, maxPage) {
                 var tempObj = preObj.next();
@@ -57,18 +60,18 @@
                     tempObj = tempObj.next();
                 }
             }
-
+            //回调函数
             function callBack(curr) {
                 defaults.callback(curr, defaults.limit, totalCount);
             }
-
+            //目前页码点击后的函数
             currentObj.click(function (event) {
                 event.preventDefault();
-                var currPage = Number($(this).find('a').html());
-                var activeObj = pageObj.find('li[class="active"]');
-                var activePage = Number(activeObj.find('a').html());
+                var currPage = Number($(this).find('a').html()); //找到所点击的页码
+                var activeObj = pageObj.find('li[class="active"]');//目前的页码对象
+                var activePage = Number(activeObj.find('a').html());//目前的页码
 
-                if (currPage == activePage) return false;
+                if (currPage == activePage) return false;   //若点击的和目前的相同，无效果
                 if (totalPage > showPage && currPage > 1) {
                     var maxPage = currPage; 
                     var minPage = 1;
@@ -85,7 +88,7 @@
                         loopPageElement(minPage, maxPage)
                     }                  
                 }
-                activeObj.removeClass('active');
+                activeObj.removeClass('active');    //替换active所在的位置
                 $.each(currentObj, function (index, thiz) {
                     if ($(thiz).find('a').html() == currPage) {
                         $(thiz).addClass('active');
@@ -93,9 +96,10 @@
                     }
                 });
 
-                $(obj).load(targetHerf + currPage + ' ' + targetId);
+                $(obj).load(targetHerf + currPage + ' ' + targetId); //加载所要取得的东西
 
             });
+            //和前边类似
             preObj.click(function (event) {
                 event.preventDefault();
                 var activeObj = pageObj.find('li[class="active"]');
