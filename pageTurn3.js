@@ -47,6 +47,17 @@
                 $(this).find('ul.pagination li.next').prev().removeClass('hidden');		//当目前的页码小于尾部中间页码时，后面的省略号可视
             }
         }
+        //　跳转到指定页面
+        var appointObj = $(this).find('#appoint');
+        var appointInput = $(this).find('input');
+        appointObj.click(function(){
+            var appointNumber = appointInput.val();
+            if(appointNumber <= totalPage && appointNumber > 0 && appointNumber != pageNumber){
+                window.location.href = targetHerf + appointNumber;
+            }else{
+                return false;
+            }       
+        });
         //　增加　跳页功能
         function addPagination(beginNumber,endNumber){
             var html = [];	//要添加的html
